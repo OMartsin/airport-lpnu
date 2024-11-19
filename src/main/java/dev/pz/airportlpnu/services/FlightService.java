@@ -14,11 +14,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -50,22 +50,29 @@ public class FlightService {
 
 
     public Page<FlightDTO> searchFlights(String departureLocation, String arrivalLocation, String departureDate,
-                                         String arrivalDate, Integer passengers, String classType, boolean includeFlightWithoutSeats, int page, int size) {
+                                         String arrivalDate, Integer passengers, String classType,
+                                         boolean includeFlightWithoutSeats, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDateTime departureDateTime = departureDate != null ? LocalDate.parse(departureDate, formatter).atStartOfDay() : null;
-        LocalDateTime arrivalDateTime = arrivalDate != null ? LocalDate.parse(arrivalDate, formatter).atTime(23, 59) : null;
-        ClassType classTypeObj = classType != null ? ClassType.valueOf(classType) : null;
+        LocalDate parsedDepartureDate = (departureDate != null && !departureDate.isEmpty())
+                ? LocalDate.parse(departureDate, formatter)
+                : null;
+        LocalDate parsedArrivalDate = (arrivalDate != null && !arrivalDate.isEmpty())
+                ? LocalDate.parse(arrivalDate, formatter)
+                : null;
 
-        Page<Flight> flights = flightRepository.findAll(
-                FlightSpecifications.hasDepartureLocation(departureLocation)
-                        .and(FlightSpecifications.hasArrivalLocation(arrivalLocation))
-                        .and(FlightSpecifications.departureTimeBetween(departureDateTime, arrivalDateTime))
-                        .and(FlightSpecifications.hasAvailableSeatsForClass(classTypeObj, passengers))
-                        .and(FlightSpecifications.hasAvailableSeats(includeFlightWithoutSeats)),
-                pageable
-        );
+        ClassType classTypeEnum = (classType != null && !classType.isEmpty())
+                ? ClassType.valueOf(classType)
+                : null;
+
+        Specification<Flight> flightSpec = Specification.where(FlightSpecifications.hasDepartureLocation(departureLocation))
+                .and(FlightSpecifications.hasArrivalLocation(arrivalLocation))
+                .and(FlightSpecifications.departureOrArrivalDateBetween(parsedDepartureDate, parsedArrivalDate))
+                .and(FlightSpecifications.hasAvailableSeatsForClass(classTypeEnum, passengers))
+                .and(FlightSpecifications.hasAvailableSeats(includeFlightWithoutSeats));
+
+        Page<Flight> flights = flightRepository.findAll(flightSpec, pageable);
 
         return flights.map(flight -> {
             BigDecimal minPrice = getMinPriceForFlight(flight);
@@ -73,6 +80,7 @@ public class FlightService {
             return flightMapper.toDTO(flight, minPrice, availableClasses);
         });
     }
+
 
     private BigDecimal getMinPriceForFlight(Flight flight) {
         return priceHistoryRepository.findByFlightIdOrderByUpdatedAtDesc(flight.getId())

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Email Notification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .content {
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .footer {
+            text-align: center;
+            color: #888;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+<div class="content">
+    <h2>Hello, User!</h2>
+    <p>You have successfully subscribed to our ticket tracking system.</p>
+    <p>When the tickets matching your request appear, we will notify you immediately.</p>
+    <p><a th:href="${link}">View Available Flights</a></p>
+</div>
+<div class="footer">
+    <p>&copy; 2024 Ticket Service</p>
+</div>
+</body>
+</html>

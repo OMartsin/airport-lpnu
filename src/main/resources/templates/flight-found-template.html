@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Flight Found</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+        .content {
+            padding: 20px;
+        }
+        .flight {
+            border: 1px solid #ddd;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .flight h3 {
+            margin: 0;
+            color: #333;
+        }
+        .footer {
+            text-align: center;
+            color: #888;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>We Found Flights for You!</h1>
+</div>
+<div class="content">
+    <p>Hello, User!</p>
+    <p>We have found the following flights matching your criteria:</p>
+
+    <!-- Iterate over flights -->
+    <div th:each="flight : ${flights}">
+        <div class="flight">
+            <h3 th:text="${flight.airline} + ' - ' + ${flight.departureLocation} + ' to ' + ${flight.arrivalLocation}"></h3>
+            <p>Departure: <span th:text="${flight.departureTime}"></span></p>
+            <p>Arrival: <span th:text="${flight.arrivalTime}"></span></p>
+            <p>Price: <span th:text="${flight.minPrice}"></span> USD</p>
+            <p><a th:href="${link} + '/' + ${flight.id}">View Details</a></p>
+        </div>
+    </div>
+
+    <p>Click the links above to reserve your tickets.</p>
+</div>
+<div class="footer">
+    <p>&copy; 2024 Ticket Service</p>
+</div>
+</body>
+</html>
