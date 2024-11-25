@@ -26,7 +26,8 @@ public class FlightSubscriptionService {
     private final Integer size = 20;
 
     public void createSubscription(String email, String departureLocation, String arrivalLocation,
-                                   String departureDate, String arrivalDate, Integer passengers, String classType) {
+                                   String departureDate, String arrivalDate, Integer passengers, String classType,
+                                   Integer minDurationMinutes, Integer maxDurationMinutes, Integer minPrice, Integer maxPrice) {
         FlightSubscription subscription = new FlightSubscription();
         subscription.setEmail(email);
         subscription.setDepartureLocation(departureLocation);
@@ -35,6 +36,11 @@ public class FlightSubscriptionService {
         subscription.setArrivalDate(arrivalDate);
         subscription.setPassengers(passengers);
         subscription.setClassType(classType);
+        subscription.setMinDurationMinutes(minDurationMinutes);
+        subscription.setMaxDurationMinutes(maxDurationMinutes);
+        subscription.setMinPrice(minPrice);
+        subscription.setMaxPrice(maxPrice);
+
         subscriptionRepository.save(subscription);
 
         emailService.sendEmail(email, "Subscription Confirmation", new SubscriptionConfirmationTemplate(frontendUrl));
@@ -51,6 +57,10 @@ public class FlightSubscriptionService {
                     subscription.getArrivalDate(),
                     subscription.getPassengers(),
                     subscription.getClassType(),
+                    subscription.getMinDurationMinutes(),
+                    subscription.getMaxDurationMinutes(),
+                    subscription.getMinPrice(),
+                    subscription.getMaxPrice(),
                     false,
                     page,
                     size

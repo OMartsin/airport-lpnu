@@ -34,6 +34,18 @@ public class FlightSubscription {
     @Column
     private String classType;
 
+    @Column
+    private Integer minDurationMinutes;
+
+    @Column
+    private Integer maxDurationMinutes;
+
+    @Column
+    private Integer minPrice;
+
+    @Column
+    private Integer maxPrice;
+
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 

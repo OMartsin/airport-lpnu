@@ -18,7 +18,12 @@ public class FlightSubscriptionController {
                                    @RequestParam(required = false) String departureDate,
                                    @RequestParam(required = false) String arrivalDate,
                                    @RequestParam(required = false) Integer passengers,
-                                   @RequestParam(required = false) String classType) {
-        subscriptionService.createSubscription(email, departureLocation, arrivalLocation, departureDate, arrivalDate, passengers, classType);
+                                   @RequestParam(required = false) String classType,
+                                   @RequestParam(required = false) Integer minDurationMinutes,
+                                   @RequestParam(required = false) Integer maxDurationMinutes,
+                                   @RequestParam(required = false) Integer minPrice,
+                                   @RequestParam(required = false) Integer maxPrice) {
+        subscriptionService.createSubscription(email, departureLocation, arrivalLocation, departureDate, arrivalDate,
+                passengers, classType, minDurationMinutes, maxDurationMinutes, minPrice, maxPrice);
     }
 }

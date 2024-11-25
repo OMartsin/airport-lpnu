@@ -51,6 +51,7 @@ public class FlightService {
 
     public Page<FlightDTO> searchFlights(String departureLocation, String arrivalLocation, String departureDate,
                                          String arrivalDate, Integer passengers, String classType,
+                                         Integer minDurationMinutes, Integer maxDurationMinutes, Integer minPrice, Integer maxPrice,
                                          boolean includeFlightWithoutSeats, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
 
@@ -70,21 +71,30 @@ public class FlightService {
                 .and(FlightSpecifications.hasArrivalLocation(arrivalLocation))
                 .and(FlightSpecifications.departureOrArrivalDateBetween(parsedDepartureDate, parsedArrivalDate))
                 .and(FlightSpecifications.hasAvailableSeatsForClass(classTypeEnum, passengers))
-                .and(FlightSpecifications.hasAvailableSeats(includeFlightWithoutSeats));
+                .and(FlightSpecifications.hasAvailableSeats(includeFlightWithoutSeats))
+                .and(FlightSpecifications.hasDurationBetween(minDurationMinutes, maxDurationMinutes))
+                .and(FlightSpecifications.hasPriceBetween(minPrice, maxPrice));
 
         Page<Flight> flights = flightRepository.findAll(flightSpec, pageable);
 
         return flights.map(flight -> {
-            BigDecimal minPrice = getMinPriceForFlight(flight);
+            BigDecimal minFlightPrice = getCheapestLatestPrice(flight);
             List<ClassType> availableClasses = getAvailableClassesForFlight(flight, passengers);
-            return flightMapper.toDTO(flight, minPrice, availableClasses);
+            return flightMapper.toDTO(flight, minFlightPrice, availableClasses);
         });
     }
 
+    private BigDecimal getCheapestLatestPrice(Flight flight) {
+        List<PriceHistory> priceHistories = priceHistoryRepository.findByFlightIdOrderByUpdatedAtDesc(flight.getId());
 
-    private BigDecimal getMinPriceForFlight(Flight flight) {
-        return priceHistoryRepository.findByFlightIdOrderByUpdatedAtDesc(flight.getId())
-                .stream()
+        Map<ClassType, PriceHistory> latestPricesByClassType = priceHistories.stream()
+                .collect(Collectors.toMap(
+                        PriceHistory::getClassType,
+                        priceHistory -> priceHistory,
+                        (existing, replacement) -> existing.getUpdatedAt().isAfter(replacement.getUpdatedAt()) ? existing : replacement
+                ));
+
+        return latestPricesByClassType.values().stream()
                 .map(PriceHistory::getPrice)
                 .min(Comparator.naturalOrder())
                 .orElse(BigDecimal.ZERO);

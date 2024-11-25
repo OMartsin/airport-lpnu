@@ -20,11 +20,15 @@ public class FlightController {
                                       @RequestParam(required = false) String arrivalDate,
                                       @RequestParam(required = false) Integer passengers,
                                       @RequestParam(required = false) String classType,
+                                      @RequestParam(required = false) Integer minDurationMinutes,
+                                      @RequestParam(required = false) Integer maxDurationMinutes,
+                                      @RequestParam(required = false) Integer minPrice,
+                                      @RequestParam(required = false) Integer maxPrice,
                                       @RequestParam(required = false, defaultValue = "false") boolean includeFlightWithoutSeats,
                                       @RequestParam(required = false, defaultValue = "0") int page,
                                       @RequestParam(required = false, defaultValue = "20") int size) {
         return flightService.searchFlights(departureLocation, arrivalLocation, departureDate, arrivalDate, passengers,
-                classType, includeFlightWithoutSeats, page, size);
+                classType, minDurationMinutes, maxDurationMinutes, minPrice, maxPrice, includeFlightWithoutSeats, page, size);
     }
 
     @GetMapping("/{id}")
