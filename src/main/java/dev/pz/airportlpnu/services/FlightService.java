@@ -84,7 +84,7 @@ public class FlightService {
         });
     }
 
-    private BigDecimal getCheapestLatestPrice(Flight flight) {
+    public BigDecimal getCheapestLatestPrice(Flight flight) {
         List<PriceHistory> priceHistories = priceHistoryRepository.findByFlightIdOrderByUpdatedAtDesc(flight.getId());
 
         Map<ClassType, PriceHistory> latestPricesByClassType = priceHistories.stream()

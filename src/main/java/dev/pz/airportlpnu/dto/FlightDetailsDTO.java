@@ -1,7 +1,9 @@
 package dev.pz.airportlpnu.dto;
 
 import dev.pz.airportlpnu.entities.ClassType;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -9,6 +11,8 @@ import java.util.Map;
 import java.util.List;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class FlightDetailsDTO {
     private Long id;
     private String departureLocation;

@@ -37,12 +37,7 @@ public class SeatsService {
                     BigDecimal basePrice = basePrices.getOrDefault(classType, BigDecimal.ZERO);
                     BigDecimal finalPrice = basePrice.multiply(BigDecimal.valueOf(seatOption.getPriceMultiplier()));
 
-                    AvailableSeatDTO dto = new AvailableSeatDTO();
-                    dto.setClassType(classType);
-                    dto.setSeatOption(seatOption.getName().toString());
-                    dto.setPrice(finalPrice);
-                    dto.setAmount(count.intValue());
-                    return dto;
+                    return new AvailableSeatDTO(classType, seatOption.getName().toString(), finalPrice, count.intValue());
                 })
                 .collect(Collectors.toList());
     }
